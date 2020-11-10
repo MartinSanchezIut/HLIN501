@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <cmath>
+#include <climits>
 
 using namespace std;
 
@@ -23,7 +24,6 @@ int carre(int n) {	return n * n; }
 float distance(coord p1,coord p2) {
 	return sqrt(  carre(p1.abs - p2.abs) + carre(p1.ord - p2.ord)  ) ;
 }
-
 
 void voisins(int n, int dmax,coord point[], vector<int> voisin[], int &m) {
 	for (int i = 0; i < n; ++i){
@@ -59,7 +59,7 @@ void affichageGraphique(int n,int m,coord point[],int arete[][2],string name) {
 	output << endl;
 
 	for(int i=0;i<n;i++){
-		output << point[i].abs << " " << point[i].ord << " 5 0 360 arc" <<endl;
+		output << point[i].abs << " " << point[i].ord << " 2 0 360 arc" <<endl;
 		output << "0 setgray" <<endl;
 		output << "fill" <<endl;
 		output << "stroke"<<endl;
@@ -88,11 +88,61 @@ void affichageGraphique(int n,int m,coord point[],int arete[][2],string name) {
 
 
 
-bool existe(int n,int dis[],bool traite[],int &x);
+bool existe(int n,float dis[],bool traite[],int &x) {
+	int distMin = -1;
 
-void dijkstra(int n,vector<int> voisin[],coord point[],int pere[]);
+	for (int i = 0; i < n; ++i){
+		if ((! traite[i]) && (dis[i] < distMin || distMin < 0)) {
+			distMin = dis[i];
+			x = i;
+		}
+	}
 
-int construireArbre(int n,int arbre[][2],int pere[]);
+	return !(distMin < 0) ;
+}
+
+void dijkstra(int n, vector<int> voisin[], coord point[], int pere[]) {
+	float distances[n];
+	bool traite[n];
+
+	for (int i = 0; i < n; ++i)	{
+		distances[i] = INT_MAX;
+		traite[i] = false ;
+	}
+
+	int racine = 0;
+	pere[racine] = racine;
+	distances[racine] = 0;
+
+	int x;
+	while(existe(n, distances, traite, x ) ) {
+		traite[x] = 1;
+
+		for (int i = 0; i < voisin[x].size(); ++i){
+
+
+			if ((traite[voisin[x].at(i)] == false) && (distances[voisin[x].at(i)] > distances[x] 
+				+ distance(point[x], point[voisin[x].at(i)]) ) ) {
+
+				distances[voisin[x].at(i)] = distances[x] + distance(point[x], point[voisin[x].at(i)]);
+				pere[voisin[x].at(i)] = x;
+			}
+		}
+	}
+}
+
+  //    affichageGraphique(n, m/2, point, arete , "Test") ;
+
+int construireArbre(int n,int arbre[][2],int pere[]) {
+	int k = 0;
+
+	for (int i = 0; i < n; ++i)	{
+		arbre[i][0] = i;
+		arbre[i][1] = pere[i] ;
+		k++;
+	}
+	return k;
+}
 
 
 int main() {
@@ -111,7 +161,9 @@ int main() {
   int m = 0;                           // Le nombre d'arete
   int arete[M][2];                 // Les aretes du graphe
 
+cout << "test" << endl;
   pointRandom(N, point) ;
+  cout << "	a" << endl;
   for (int i = 0; i < N; ++i)  {
   	cout << "Point " << i << " : " << point[i].abs << " - " << point[i].ord << endl;
   }
@@ -134,6 +186,12 @@ int main() {
   }
 
   affichageGraphique(n, m/2, point, arete , "Test") ;
+
+
+  dijkstra(n, voisin, point, pere);
+
+  int nbA = construireArbre(n, arbre, pere);
+  affichageGraphique(n, nbA, point, arbre , "Arbre") ;
 
   return EXIT_SUCCESS;
 }
