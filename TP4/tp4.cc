@@ -6,7 +6,7 @@
 
 using namespace std;
 
-const int N=20;
+const int N=1000;
 const int M=(N*(N-1))/2;
   
 typedef struct coord{int abs; int ord;} coord;
