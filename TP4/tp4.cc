@@ -7,8 +7,9 @@
 
 using namespace std;
 
-const int N=1000;
-const int M=(N*(N-1))/2;
+//const int N=2000;
+//const int M=(N*(N-1))/2;
+
   
 typedef struct coord{int abs; int ord;} coord;
 
@@ -146,9 +147,11 @@ int construireArbre(int n,int arbre[][2],int pere[]) {
 
 
 int main() {
-  int n = N;                           // Le nombre de points.
+  int n = 1000;  
+  int N = n; 
   cout << "Entrer le nombre de points: "; cout << endl;
   //cin >> n; 
+  int M=(N*(N-1))/2;
   
   int dmax=50;                     // La distance jusqu'a laquelle on relie deux points.
   
